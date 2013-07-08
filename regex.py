@@ -52,6 +52,7 @@ def compile(p):
         elif t.name == 'CONCAT':
             n2 = nfa_stack.pop()
             n1 = nfa_stack.pop()
+            n1.end.is_end = False
             n1.end.epsilon.append(n2.start)
             nfa = NFA(n1.start, n2.end)
             nfa_stack.append(nfa)
@@ -64,6 +65,8 @@ def compile(p):
             s3 = create_state()
             n1.end.epsilon.append(s3)
             n2.end.epsilon.append(s3)
+            n1.end.is_end = False
+            n2.end.is_end = False
             nfa = NFA(s0, s3)
             nfa_stack.append(nfa)
         
@@ -74,6 +77,7 @@ def compile(p):
             s0.epsilon = [n1.start, s1]
             n1.end.epsilon.append(n1.start)
             n1.end.epsilon.append(s1)
+            n1.end.is_end = False
             nfa = NFA(s0, s1)
             nfa_stack.append(nfa)
 

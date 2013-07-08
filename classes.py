@@ -104,6 +104,7 @@ class State:
         self.transitions = {} # char : list of states
         self.name = name
         self.in_current_states = False
+        self.is_end = False
     
     def clean(self): # set in_current_states to False for all related states
         self.in_current_states = False
@@ -116,6 +117,7 @@ class NFA:
     def __init__(self, start, end):
         self.start = start
         self.end = end # start and end states
+        end.is_end = True
     
     def clone(self, state, current_states):
         if len(state.epsilon) == 0:
@@ -150,6 +152,6 @@ class NFA:
             current_states = next_states
 
         for s in current_states:
-            if s == self.end:
+            if s.is_end:
                 return True
         return False
