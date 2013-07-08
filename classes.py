@@ -101,10 +101,16 @@ class Parser:
 class State:
     def __init__(self, name):
         self.epsilon = [] # eps-closure
-        self.transitions = {} # char : state
+        self.transitions = {} # char : list of state
         self.name = name
         self.in_current_states = False
-
+    
+    def clean(self): # set in_current_states to False for all related states
+        self.in_current_states = False
+        for s in self.epsilon:
+            s.clean()
+        for c in self.transitions.keys():
+            self.transitions[c].clean()
 
 class NFA:
     def __init__(self, start, end):
@@ -122,6 +128,7 @@ class NFA:
                     self.clone(eps, current_states)
             return current_states
 
+    
     def match(self,s):
         current_states = [self.start] 
         current_states = self.clone(self.start, current_states)
@@ -134,17 +141,15 @@ class NFA:
                         next_states.append(s)
                         s.in_current_states = True
                         next_states = self.clone(s, next_states)
-            current_states = next_states
-        
             # clean up
             for s in current_states:
                 s.in_current_states = False
             for s in next_states:
                 s.in_current_states = False
 
+            current_states = next_states
+
         for s in current_states:
             if s == self.end:
                 return True
         return False
-   
-    

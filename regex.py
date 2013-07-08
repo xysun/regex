@@ -85,7 +85,10 @@ def main():
     status_i = 0
 
     nfa = compile('bc|ac*')
-    print(nfa.match('bccc'))
+    print(nfa.match('ac'))
+    print(nfa.match('accc'))
+    print(nfa.match('bc'))
+    print(nfa.match('bac'))
 
 if __name__ == '__main__':
     main()
