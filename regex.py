@@ -45,7 +45,7 @@ def compile(p):
         if t.name == 'CHAR': # push onto stack 
             s0 = create_state()
             s1 = create_state()
-            s0.transitions[t.value] = s1
+            s0.transitions[t.value] = [s1]
             nfa = NFA(s0, s1)
             nfa_stack.append(nfa)
         

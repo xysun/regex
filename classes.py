@@ -101,7 +101,7 @@ class Parser:
 class State:
     def __init__(self, name):
         self.epsilon = [] # eps-closure
-        self.transitions = {} # char : list of state
+        self.transitions = {} # char : list of states
         self.name = name
         self.in_current_states = False
     
@@ -136,11 +136,11 @@ class NFA:
             next_states = []
             for state in current_states:
                 if c in state.transitions.keys():
-                    s = state.transitions[c]
-                    if not s.in_current_states:
-                        next_states.append(s)
-                        s.in_current_states = True
-                        next_states = self.clone(s, next_states)
+                    for s in state.transitions[c]:
+                        if not s.in_current_states:
+                            next_states.append(s)
+                            s.in_current_states = True
+                            next_states = self.clone(s, next_states)
             # clean up
             for s in current_states:
                 s.in_current_states = False
