@@ -126,23 +126,19 @@ class NFA:
         self.end = end # start and end states
         end.is_end = True
     
-    def clone(self, state, current_states):
-        if len(state.epsilon) == 0:
-            return current_states
-        else:
-            for eps in state.epsilon:
-                if not eps.in_current_states:
-                    current_states.append(eps)
-                    eps.in_current_states = True
-                    self.clone(eps, current_states)
-            return current_states
-
+    def addstate(self, state, state_list): # add state + epsilon transitions
+        if state.in_current_states:
+            return
+        state_list.append(state)
+        state.in_current_states = True
+        for eps in state.epsilon:
+            self.addstate(eps, state_list)
     
     def match(self,s):
-        current_states = [self.start] 
-        current_states = self.clone(self.start, current_states)
-        # clean is_current_states flag
+        current_states = []
+        self.addstate(self.start, current_states)
         
+        # clean is_current_states flag 
         for state in current_states:
             state.in_current_states = False
         
@@ -150,11 +146,8 @@ class NFA:
             next_states = []
             for state in current_states:
                 if c in state.transitions.keys():
-                    for trans_state in state.transitions[c]:
-                        if not trans_state.in_current_states:
-                            next_states.append(trans_state)
-                            trans_state.in_current_states = True
-                            next_states = self.clone(trans_state, next_states)
+                    trans_state = state.transitions[c]
+                    self.addstate(trans_state, next_states)
             # clean up
             for state in current_states:
                 state.in_current_states = False

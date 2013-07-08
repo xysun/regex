@@ -5,9 +5,12 @@
 # TODO: 
 #     more rigorous bnf grammar for regex
 #     add . ()
-#     add unit tests
+#     better unit tests
 #     backreferences?
-#     construct DFA
+#     convert to DFA
+#
+# For code review:
+#     how to avoid re2postfix?
 
 
 from classes import Lexer, Parser, Token, State, NFA
@@ -31,7 +34,7 @@ def compile(p):
         if t.name == 'CHAR': # push onto stack 
             s0 = create_state()
             s1 = create_state()
-            s0.transitions[t.value] = [s1]
+            s0.transitions[t.value] = s1
             nfa = NFA(s0, s1)
             nfa_stack.append(nfa)
         
