@@ -9,5 +9,5 @@ p = 'a?' * n + 'a' * n
 nfa = regex.compile(p)
 input_string = 'a' * n
 matched = nfa.match(input_string)
-print(matched) // True
+print(matched) # True
 ```
