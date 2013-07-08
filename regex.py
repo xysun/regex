@@ -75,9 +75,18 @@ def compile(p):
             s0 = create_state()
             s1 = create_state()
             s0.epsilon = [n1.start, s1]
-            n1.end.epsilon.append(n1.start)
-            n1.end.epsilon.append(s1)
+            n1.end.epsilon.extend([s1, n1.start])
             n1.end.is_end = False
+            nfa = NFA(s0, s1)
+            nfa_stack.append(nfa)
+
+        elif t.name == 'PLUS':
+            n1 = nfa_stack.pop()
+            s0 = create_state()
+            s1 = create_state()
+            n1.end.is_end = False
+            s0.epsilon = [n1.start]
+            n1.end.epsilon.extend([s1, n1.start])
             nfa = NFA(s0, s1)
             nfa_stack.append(nfa)
 
@@ -88,11 +97,13 @@ def main():
     global status_i
     status_i = 0
 
-    nfa = compile('bc|ac*')
+    nfa = compile('bc|ac+')
+
     print(nfa.match('ac'))
-    print(nfa.match('accc'))
+    print(nfa.match('acc'))
     print(nfa.match('bc'))
     print(nfa.match('bac'))
+    print(nfa.match('a'))
 
 if __name__ == '__main__':
     main()

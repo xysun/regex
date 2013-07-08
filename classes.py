@@ -18,7 +18,7 @@ class Token:
 class Lexer:
     def __init__(self, pattern):
         self.source = pattern
-        self.symbols = {'(':'LEFT_PAREN', ')':'RIGHT_PAREN', '*':'STAR', '|':'ALT', '\x08':'CONCAT'}
+        self.symbols = {'(':'LEFT_PAREN', ')':'RIGHT_PAREN', '*':'STAR', '|':'ALT', '\x08':'CONCAT', '+':'PLUS'}
         self.current = 0
         self.length = len(self.source)
         self.eof = False
@@ -77,18 +77,25 @@ class Parser:
                 if not self.lexer.eof and self.lookahead.name == 'STAR':
                     self.step_back()
                     self.star()
+                elif not self.lexer.eof and self.lookahead.name == 'PLUS':
+                    self.step_back()
+                    self.star()
                 else:
                     self.tokens.append(t)
                 self.tokens.append(Token('CONCAT', '\x08'))
             else:
                 break
 
-    def star(self):
+    def star(self): # STAR | PLUS
         self.char()
         while True:
             if not self.lexer.eof and self.lookahead.name == 'STAR':
                 t = self.lookahead 
                 self.match('STAR')
+                self.tokens.append(t)
+            elif not self.lexer.eof and self.lookahead.name == 'PLUS':
+                t = self.lookahead
+                self.match('PLUS')
                 self.tokens.append(t)
             else:
                 break
@@ -106,13 +113,6 @@ class State:
         self.in_current_states = False
         self.is_end = False
     
-    def clean(self): # set in_current_states to False for all related states
-        self.in_current_states = False
-        for s in self.epsilon:
-            s.clean()
-        for c in self.transitions.keys():
-            self.transitions[c].clean()
-
 class NFA:
     def __init__(self, start, end):
         self.start = start
@@ -124,7 +124,7 @@ class NFA:
             return current_states
         else:
             for eps in state.epsilon:
-                if not eps.in_current_states:   
+                if not eps.in_current_states:
                     current_states.append(eps)
                     eps.in_current_states = True
                     self.clone(eps, current_states)
@@ -134,21 +134,26 @@ class NFA:
     def match(self,s):
         current_states = [self.start] 
         current_states = self.clone(self.start, current_states)
+        # clean is_current_states flag
+        
+        for state in current_states:
+            state.in_current_states = False
+        
         for c in s:
             next_states = []
             for state in current_states:
                 if c in state.transitions.keys():
-                    for s in state.transitions[c]:
-                        if not s.in_current_states:
-                            next_states.append(s)
-                            s.in_current_states = True
-                            next_states = self.clone(s, next_states)
+                    for trans_state in state.transitions[c]:
+                        if not trans_state.in_current_states:
+                            next_states.append(trans_state)
+                            trans_state.in_current_states = True
+                            next_states = self.clone(trans_state, next_states)
             # clean up
-            for s in current_states:
-                s.in_current_states = False
-            for s in next_states:
-                s.in_current_states = False
-
+            for state in current_states:
+                state.in_current_states = False
+            for state in next_states:
+                state.in_current_states = False
+            
             current_states = next_states
 
         for s in current_states:
