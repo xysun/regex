@@ -18,7 +18,7 @@ class Token:
 class Lexer:
     def __init__(self, pattern):
         self.source = pattern
-        self.symbols = {'(':'LEFT_PAREN', ')':'RIGHT_PAREN', '*':'STAR', '|':'ALT', '\x08':'CONCAT', '+':'PLUS'}
+        self.symbols = {'(':'LEFT_PAREN', ')':'RIGHT_PAREN', '*':'STAR', '|':'ALT', '\x08':'CONCAT', '+':'PLUS', '?':'QMARK'}
         self.current = 0
         self.length = len(self.source)
         self.eof = False
@@ -80,6 +80,9 @@ class Parser:
                 elif not self.lexer.eof and self.lookahead.name == 'PLUS':
                     self.step_back()
                     self.star()
+                elif not self.lexer.eof and self.lookahead.name == 'QMARK':
+                    self.step_back()
+                    self.star()
                 else:
                     self.tokens.append(t)
                 self.tokens.append(Token('CONCAT', '\x08'))
@@ -96,6 +99,10 @@ class Parser:
             elif not self.lexer.eof and self.lookahead.name == 'PLUS':
                 t = self.lookahead
                 self.match('PLUS')
+                self.tokens.append(t)
+            elif not self.lexer.eof and self.lookahead.name == 'QMARK':
+                t = self.lookahead
+                self.match('QMARK')
                 self.tokens.append(t)
             else:
                 break

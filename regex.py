@@ -3,29 +3,15 @@
 # 06-JUL-2013
 # currently supporting: alteration(|), concatenation, star(*) operator
 # TODO: 
-#more rigorous bnf grammar for regex
+#     more rigorous bnf grammar for regex
+#     add . ()
+#     add unit tests
+#     backreferences?
+#     construct DFA
+
 
 from classes import Lexer, Parser, Token, State, NFA
-import pdb
-
-
-def test(p):
-    lexer = Lexer(p)
-    parser = Parser(lexer)
-    tokens = parser.prog()
-    for t in tokens:
-        print(t)
-
-s0 = State('s0')
-s1 = State('s1')
-s2 = State('s2')
-s3 = State('s3')
-
-s0.epsilon = [s1, s3]
-s1.transitions = {'a':s2}
-s2.epsilon = [s1, s3]
-
-nfa = NFA(s0, s3) # sample NFA: a*
+import pdb, re, time
 
 state_i = 0
 
@@ -89,6 +75,11 @@ def compile(p):
             n1.end.epsilon.extend([s1, n1.start])
             nfa = NFA(s0, s1)
             nfa_stack.append(nfa)
+        
+        elif t.name == 'QMARK':
+            n1 = nfa_stack.pop()
+            n1.start.epsilon.append(n1.end)
+            nfa_stack.append(n1)
 
     return nfa_stack.pop() # TODO: check len(nfa_stack) == 1?
 
@@ -97,13 +88,24 @@ def main():
     global status_i
     status_i = 0
 
-    nfa = compile('bc|ac+')
+    nfa = compile('ab?')
+    print(nfa.match('ab'))
 
-    print(nfa.match('ac'))
-    print(nfa.match('acc'))
-    print(nfa.match('bc'))
-    print(nfa.match('bac'))
-    print(nfa.match('a'))
+def test_pathological(n):
+    p = 'a?' * n + 'a' * n
+    nfa_python = re.compile(p)
+    nfa_me = compile(p)
+    string = 'a' * n
+    # test python
+    t0 = time.time()
+    m = nfa_python.match(string)
+    print("Python:", time.time() - t0)
+    print("result:", m)
+    # test mine
+    t0 = time.time()
+    m = nfa_me.match(string)
+    print("Thompson's Algo:", time.time() - t0)
+    print("result:", m)
 
 if __name__ == '__main__':
     main()
