@@ -20,6 +20,6 @@ Currently it supports the following:
 
 ### Credits
 
-* Test suite is based on [Glenn Fowler](www2.research.att.com/~gsf/testregex/)'s regex test suites.
+* Test suite is based on [Glenn Fowler](http://www2.research.att.com/~gsf/testregex/)'s regex test suites.
 
 * [Russ Cos](http://swtch.com/~rsc/regexp/) has an excellent collection of articles on regex.
