@@ -3,18 +3,15 @@
 # 06-JUL-2013
 # currently supporting: alteration(|), concatenation, star(*) operator
 # TODO: 
-#     more rigorous bnf grammar for regex
-#     add . ()
-#     better unit tests
+#     more rigorous bnf grammar for regex                 DONE
+#     add . 
+#     better unit tests                                   DONE
 #     backreferences? NO
 #     convert to DFA
 #     draw NFA in debug mode using Graphviz
-#
-# For code review:
-#     how to avoid re2postfix?
 
 
-from classes import Lexer, Parser, Token, State, NFA, re2postfix
+from parse import Lexer, Parser, Token, State, NFA
 import pdb, re, time
 
 state_i = 0
@@ -24,16 +21,21 @@ def create_state():
     state_i += 1
     return State('s' + str(state_i))
 
-def compile(p):
-#    lexer = Lexer(p)
-#    parser = Parser(lexer)
-#    tokens = parser.prog()
-    tokens = re2postfix(p)
+def print_tokens(tokens):
+    for t in tokens:
+        print(t)
+
+def compile(p, debug = False):
+    lexer = Lexer(p)
+    parser = Parser(lexer)
+    tokens = parser.parse()
+    if debug:
+        print_tokens(tokens) 
 
     nfa_stack = []
     for t in tokens:
         
-        if t.name == 'CHAR': # push onto stack 
+        if t.name == 'CHAR':  
             s0 = create_state()
             s1 = create_state()
             s0.transitions[t.value] = s1
@@ -89,12 +91,14 @@ def compile(p):
     assert len(nfa_stack) == 1
     return nfa_stack.pop() 
 
-def main():
+def main(debug = False):
     global status_i
     status_i = 0
-
-    nfa = compile('ab?')
-    print(nfa.match('ab'))
+    
+    nfa = compile('(Ab|cD)*', debug)
+    if debug:
+        nfa.pretty_print()
+    print(nfa.match('Abc'))
 
 def test_pathological(n):
     p = 'a?' * n + 'a' * n
@@ -113,4 +117,4 @@ def test_pathological(n):
     print("result:", m)
 
 if __name__ == '__main__':
-    main()
+    main(debug = True)

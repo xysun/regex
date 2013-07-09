@@ -1,4 +1,4 @@
-A regex engine in Python following Thompson's Algorithm. This will perform significantly better than the backtracking approach implemented in Python's `re` module over some pathological patterns. 
+A regex engine in Python following Thompson's Algorithm. This will perform significantly better than the backtracking approach implemented in Python's `re` module on some pathological patterns. 
 
 It has the same interface as Python's `re` module:
 
@@ -11,3 +11,15 @@ input_string = 'a' * n
 matched = nfa.match(input_string)
 print(matched) # True
 ```
+
+Currently it supports the following:
+
+* Repitition operators: \* \+ ? 
+* Parenthesis
+* Characters (no character sets)
+
+### Credits
+
+* Test suite is based on [Glenn Fowler](www2.research.att.com/~gsf/testregex/)'s regex test suites.
+
+* [Russ Cos](http://swtch.com/~rsc/regexp/) has an excellent collection of articles on regex.
