@@ -8,12 +8,63 @@
 import pdb
 
 class Token:
+    precedence_table = {'ALT':0, 'CONCAT':1, 'PLUS': 2, 'STAR': 2, 'QMARK':2, 'LEFT_PAREN':-1, 'RIGHT_PAREN':-1, 'CHAR': -1} # -1 should never be used
+    
     def __init__(self, name, value):
         self.name = name
         self.value = value
+        self.precedence = Token.precedence_table[name]
 
     def __str__(self):
         return self.name + ":" + self.value
+
+def re2postfix(pattern): # transform to postfix
+    symbols = {'(':'LEFT_PAREN', ')':'RIGHT_PAREN', '*':'STAR', '|':'ALT', '\x08':'CONCAT', '+':'PLUS', '?':'QMARK'}
+    operators = []
+    tokens = [] 
+    
+    l = len(pattern)
+    i = 0
+    
+    def handle_char(c, i):
+        if c in symbols.keys(): # operator
+            t = Token(symbols[c], c)
+            if c == '(':
+                operators.append(t)
+            elif c == ')':
+                t2 = operators.pop()
+                while t2.name != 'LEFT_PAREN':
+                    tokens.append(t2)
+                    t2 = operators.pop()
+            elif c == '*' or c == '+' or c == '?':
+                tokens.append(t)
+            else:
+                while len(operators) > 0 and operators[-1].precedence >= t.precedence:
+                    tokens.append(operators.pop())
+                operators.append(t)
+
+        else: # char
+            t = Token('CHAR', c)
+            tokens.append(t)
+            if i + 1 < l:
+                c1 = pattern[i+1]
+                if not c1 in symbols.keys(): # two chars together
+                    handle_char('\x08', -1)
+
+            else: # last char
+                handle_char('\x08', -1)
+                
+    while i < l:
+        c = pattern[i]
+        handle_char(c, i)
+        i += 1
+    
+    while len(operators) > 0:
+        tokens.append(operators.pop())
+
+    return tokens
+
+
 
 class Lexer:
     def __init__(self, pattern):

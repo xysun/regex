@@ -6,14 +6,15 @@
 #     more rigorous bnf grammar for regex
 #     add . ()
 #     better unit tests
-#     backreferences?
+#     backreferences? NO
 #     convert to DFA
+#     draw NFA in debug mode using Graphviz
 #
 # For code review:
 #     how to avoid re2postfix?
 
 
-from classes import Lexer, Parser, Token, State, NFA
+from classes import Lexer, Parser, Token, State, NFA, re2postfix
 import pdb, re, time
 
 state_i = 0
@@ -24,9 +25,10 @@ def create_state():
     return State('s' + str(state_i))
 
 def compile(p):
-    lexer = Lexer(p)
-    parser = Parser(lexer)
-    tokens = parser.prog()
+#    lexer = Lexer(p)
+#    parser = Parser(lexer)
+#    tokens = parser.prog()
+    tokens = re2postfix(p)
 
     nfa_stack = []
     for t in tokens:
@@ -83,9 +85,9 @@ def compile(p):
             n1 = nfa_stack.pop()
             n1.start.epsilon.append(n1.end)
             nfa_stack.append(n1)
-
-    return nfa_stack.pop() # TODO: check len(nfa_stack) == 1?
-
+    
+    assert len(nfa_stack) == 1
+    return nfa_stack.pop() 
 
 def main():
     global status_i
