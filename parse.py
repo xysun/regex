@@ -1,8 +1,7 @@
 # regex engine in Python
-# parse and classes
+# parser and classes
 # xiayun.sun@gmail.com
 # 06-JUL-2013
-# currently supporting: alternation (|), concatenation, star (*), question mark (?), plus (+), and parenthesis
 
 import pdb
 
@@ -20,9 +19,8 @@ class Lexer:
         self.symbols = {'(':'LEFT_PAREN', ')':'RIGHT_PAREN', '*':'STAR', '|':'ALT', '\x08':'CONCAT', '+':'PLUS', '?':'QMARK'}
         self.current = 0
         self.length = len(self.source)
-        self.eof = False
        
-    def get_token(self): # TODO: always return one None in the end
+    def get_token(self): 
         if self.current < self.length:
             c = self.source[self.current]
             self.current += 1
@@ -32,7 +30,6 @@ class Lexer:
                 token = Token(self.symbols[c], c)
             return token
         else:
-            self.eof = True
             return Token('NONE', '')
 
 class ParseError(Exception):pass
@@ -105,10 +102,9 @@ class Parser:
 
 class State:
     def __init__(self, name):
-        self.epsilon = [] # eps-closure
-        self.transitions = {} # char : list of states
+        self.epsilon = [] # epsilon-closure
+        self.transitions = {} # char : state
         self.name = name
-        self.in_current_states = False
         self.is_end = False
     
 class NFA:
@@ -117,13 +113,12 @@ class NFA:
         self.end = end # start and end states
         end.is_end = True
     
-    def addstate(self, state, state_list): # add state + epsilon transitions
-        if state.in_current_states:
+    def addstate(self, state, state_set): # add state + recursively add epsilon transitions
+        if state in state_set:
             return
-        state_list.append(state)
-        state.in_current_states = True
+        state_set.add(state)
         for eps in state.epsilon:
-            self.addstate(eps, state_list)
+            self.addstate(eps, state_set)
     
     def pretty_print(self):
         '''
@@ -132,25 +127,16 @@ class NFA:
         pass
     
     def match(self,s):
-        current_states = []
+        current_states = set()
         self.addstate(self.start, current_states)
         
-        # clean is_current_states flag 
-        for state in current_states:
-            state.in_current_states = False
-        
         for c in s:
-            next_states = []
+            next_states = set()
             for state in current_states:
                 if c in state.transitions.keys():
                     trans_state = state.transitions[c]
                     self.addstate(trans_state, next_states)
-            # clean up
-            for state in current_states:
-                state.in_current_states = False
-            for state in next_states:
-                state.in_current_states = False
-            
+           
             current_states = next_states
 
         for s in current_states:
