@@ -143,3 +143,60 @@ class NFA:
             if s.is_end:
                 return True
         return False
+
+class Handler:
+    def __init__(self):
+        self.handlers = {'CHAR':self.handle_char, 'CONCAT':self.handle_concat,
+                         'ALT':self.handle_alt, 'STAR':self.handle_rep,
+                         'PLUS':self.handle_rep, 'QMARK':self.handle_qmark}
+        self.state_count = 0
+
+    def create_state(self):
+        self.state_count += 1
+        return State('s' + str(self.state_count))
+    
+    def handle_char(self, t, nfa_stack):
+        s0 = self.create_state()
+        s1 = self.create_state()
+        s0.transitions[t.value] = s1
+        nfa = NFA(s0, s1)
+        nfa_stack.append(nfa)
+    
+    def handle_concat(self, t, nfa_stack):
+        n2 = nfa_stack.pop()
+        n1 = nfa_stack.pop()
+        n1.end.is_end = False
+        n1.end.epsilon.append(n2.start)
+        nfa = NFA(n1.start, n2.end)
+        nfa_stack.append(nfa)
+    
+    def handle_alt(self, t, nfa_stack):
+        n2 = nfa_stack.pop()
+        n1 = nfa_stack.pop()
+        s0 = self.create_state()
+        s0.epsilon = [n1.start, n2.start]
+        s3 = self.create_state()
+        n1.end.epsilon.append(s3)
+        n2.end.epsilon.append(s3)
+        n1.end.is_end = False
+        n2.end.is_end = False
+        nfa = NFA(s0, s3)
+        nfa_stack.append(nfa)
+    
+    def handle_rep(self, t, nfa_stack):
+        n1 = nfa_stack.pop()
+        s0 = self.create_state()
+        s1 = self.create_state()
+        s0.epsilon = [n1.start]
+        if t.name == 'STAR':
+            s0.epsilon.append(s1)
+        n1.end.epsilon.extend([s1, n1.start])
+        n1.end.is_end = False
+        nfa = NFA(s0, s1)
+        nfa_stack.append(nfa)
+
+    def handle_qmark(self, t, nfa_stack):
+        n1 = nfa_stack.pop()
+        n1.start.epsilon.append(n1.end)
+        nfa_stack.append(n1)
+
