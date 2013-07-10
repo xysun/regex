@@ -1,4 +1,5 @@
 # regex engine in Python
+# parse and classes
 # xiayun.sun@gmail.com
 # 06-JUL-2013
 # currently supporting: alternation (|), concatenation, star (*), question mark (?), plus (+), and parenthesis
@@ -21,7 +22,7 @@ class Lexer:
         self.length = len(self.source)
         self.eof = False
        
-    def get_token(self):
+    def get_token(self): # TODO: always return one None in the end
         if self.current < self.length:
             c = self.source[self.current]
             self.current += 1
@@ -32,6 +33,7 @@ class Lexer:
             return token
         else:
             self.eof = True
+            return Token('NONE', '')
 
 class ParseError(Exception):pass
 
@@ -63,7 +65,7 @@ class Parser:
         self.lookahead = self.lexer.get_token()
     
     def consume(self, name):
-        if self.lookahead.name == name and not self.lexer.eof:
+        if self.lookahead.name == name:
             self.lookahead = self.lexer.get_token()
         elif self.lookahead.name != name:
             raise ParseError
@@ -74,7 +76,7 @@ class Parser:
     
     def exp(self):
         self.term()
-        if self.lookahead is not None and self.lookahead.name == 'ALT':
+        if self.lookahead.name == 'ALT':
             t = self.lookahead
             self.consume('ALT')
             self.exp()
@@ -82,13 +84,13 @@ class Parser:
 
     def term(self):
         self.factor()
-        if self.lookahead is not None and self.lookahead.value not in ')|':
+        if self.lookahead.value not in ')|':
             self.term()
             self.tokens.append(Token('CONCAT', '\x08'))
     
     def factor(self):
         self.primary()
-        if self.lookahead is not None and self.lookahead.name in ['STAR', 'PLUS', 'QMARK']:
+        if self.lookahead.name in ['STAR', 'PLUS', 'QMARK']:
             self.tokens.append(self.lookahead)
             self.consume(self.lookahead.name)
 

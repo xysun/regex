@@ -1,7 +1,8 @@
 # regex engine in Python
 # xiayun.sun@gmail.com
 # 06-JUL-2013
-# currently supporting: alteration(|), concatenation, star(*) operator
+# currently supporting: alteration(|), concatenation, repetitions (* ? +), parentheses
+#
 # TODO: 
 #     more rigorous bnf grammar for regex                 DONE
 #     add . 
@@ -26,15 +27,19 @@ def print_tokens(tokens):
         print(t)
 
 def compile(p, debug = False):
+    global state_i
+    state_i = 0
+
     lexer = Lexer(p)
     parser = Parser(lexer)
     tokens = parser.parse()
+    
     if debug:
         print_tokens(tokens) 
 
     nfa_stack = []
+    
     for t in tokens:
-        
         if t.name == 'CHAR':  
             s0 = create_state()
             s1 = create_state()
@@ -92,19 +97,41 @@ def compile(p, debug = False):
     return nfa_stack.pop() 
 
 def main(debug = False):
-    global status_i
-    status_i = 0
-    
     nfa = compile('(Ab|cD)*', debug)
     if debug:
         nfa.pretty_print()
     print(nfa.match('Abc'))
+
+def timing(): 
+    '''
+    comparing re and regex
+    '''
+    with open('test_suite.dat', 'r') as f:
+        text = f.readlines()
+    f = open('time.dat', 'w')
+    f.write('Python(ms)\tRegex(ms)\n')
+    for line in text:
+        (pattern, string) = line.split()
+        #testing python
+        t1 = time.time()
+        c = re.compile(pattern)
+        c.match(string)
+        t_py = 1000 * (time.time() - t1)
+        #testing regex
+        t2 = time.time()
+        nfa = compile(pattern)
+        nfa.match(string)
+        t_regex = 1000 * (time.time() - t2)
+
+        f.write(str(t_py) + '\t' + str(t_regex) + '\n')
+    f.close()
 
 def test_pathological(n):
     p = 'a?' * n + 'a' * n
     nfa_python = re.compile(p)
     nfa_me = compile(p)
     string = 'a' * n
+    print("Pattern:", p, "\nInput:", string)
     # test python
     t0 = time.time()
     m = nfa_python.match(string)

@@ -1,15 +1,14 @@
 import regex
-import unittest
+import unittest, re, time
 
-# use basic.dat
 class TestRegex(unittest.TestCase):
     def base(self, fname):
         with open(fname) as f:
             self.text = f.readlines()
-
         for line in self.text:
             [pattern, string] = line.split()
             print(pattern, string)
+            t1 = time.time()
             nfa = regex.compile(pattern)
             self.assertEqual(nfa.match(string), True)
             print("pass")
