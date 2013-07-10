@@ -1,6 +1,8 @@
 import regex
 import unittest, re, time
 
+#NOTE: adding FALSE
+
 class TestRegex(unittest.TestCase):
     def base(self, fname):
         with open(fname) as f:
@@ -8,7 +10,6 @@ class TestRegex(unittest.TestCase):
         for line in self.text:
             [pattern, string] = line.split()
             print(pattern, string)
-            t1 = time.time()
             nfa = regex.compile(pattern)
             self.assertEqual(nfa.match(string), True)
             print("pass")

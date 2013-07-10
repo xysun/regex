@@ -18,6 +18,8 @@ Currently it supports the following:
 * Parenthesis
 * Characters (no character sets)
 
+`regex.py` is the interface, `parse.py` holds main implementation logic, `sample.py` shows some samples. 
+
 You can run `python3 testing.py -v` to ensure it passes all test cases in `test_suite.dat`
 
 ### Credits
