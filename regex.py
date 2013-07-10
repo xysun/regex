@@ -15,7 +15,6 @@
 
 
 from parse import Lexer, Parser, Token, State, NFA, Handler
-import pdb, re, time
 
 def compile(p, debug = False):
     
@@ -39,5 +38,4 @@ def compile(p, debug = False):
     
     assert len(nfa_stack) == 1
     return nfa_stack.pop() 
-
 

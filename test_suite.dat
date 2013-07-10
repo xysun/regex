@@ -1,13 +1,13 @@
-(ab|a)(bc|c)    abc
-(ab)c|abc   abc
-(a*)(b?)(b+)    aaabbbb
-((a|a)|a)   a
-(a*)(a|aa)  aaaa
-a(b)|c(d)|a(e)f aef
-(a|b)c|a(b|c)   ac
-(a|b)c|a(b|c)   ab
-(a|b)*c|(a|ab)*c    abc
-a?(ab|ba)ab abab
+(ab|a)(bc|c)    abc acb
+(ab)c|abc   abc ab
+(a*)(b?)(b+)    aaabbbb aaaa
+((a|a)|a)   a   aa
+(a*)(a|aa)  aaaa    b
+a(b)|c(d)|a(e)f aef adf
+(a|b)c|a(b|c)   ac  acc
+(a|b)c|a(b|c)   ab  acc
+(a|b)*c|(a|ab)*c    abc bbbcabbbc
+a?(ab|ba)ab abab    aaabab
 (aa|aaa)*|(a|aaaaa) aa
 \na \na
 (a)(b)(c)   abc
