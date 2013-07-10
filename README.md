@@ -18,10 +18,10 @@ Currently it supports the following:
 * Parenthesis
 * Characters (no character sets)
 
-You can run `python3 testing.py -v` to ensure it passes all test cases in `test\_suite.dat`
+You can run `python3 testing.py -v` to ensure it passes all test cases in `test_suite.dat`
 
 ### Credits
 
 * Test suite is based on [Glenn Fowler](http://www2.research.att.com/~gsf/testregex/)'s regex test suites.
 
-* [Russ Cos](http://swtch.com/~rsc/regexp/) has an excellent collection of articles on regex.
+* [Russ Cox](http://swtch.com/~rsc/regexp/) has an excellent collection of articles on regex.
