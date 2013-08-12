@@ -7,10 +7,10 @@ import regex
 import re, time
 
 def test(debug = False):
-    nfa = regex.compile('(Ab|cD)*', debug)
+    nfa = regex.compile('ab?', debug)
     if debug:
         nfa.pretty_print()
-    print(nfa.match('Abc'))
+    print(nfa.match('ab'))
 
 def timing_normal(): 
     '''
@@ -39,7 +39,7 @@ def timing_normal():
 def test_pathological(n):
     p = 'a?' * n + 'a' * n
     nfa_python = re.compile(p)
-    nfa_me = compile(p)
+    nfa_me = regex.compile(p)
     string = 'a' * n
     t0 = time.time()
     m = nfa_python.match(string)

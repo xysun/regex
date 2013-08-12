@@ -22,6 +22,13 @@ Currently it supports the following:
 
 You can run `python3 testing.py -v` to ensure it passes all test cases in `test_suite.dat`
 
+### Performance
+
+This regex engine underperforms Python's `re` module on normal inputs (using Glenn Fowler's test suite -- see below), however it outperforms significantly on pathological inputs. 
+
+![normal](plot_normal.jpg?raw=true)
+![pathological](plot_path.jpg?raw=true)
+
 ### Credits
 
 * Test suite is based on [Glenn Fowler](http://www2.research.att.com/~gsf/testregex/)'s regex test suites.
