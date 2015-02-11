@@ -1,5 +1,7 @@
 A regex engine in Python following Thompson's Algorithm. This will perform significantly better than the backtracking approach implemented in Python's `re` module on some pathological patterns. 
 
+I wrote a blog post about this project [here](http://xysun.github.io/posts/regex-parsing-thompsons-algorithm.html)
+
 It has the same interface as Python's `re` module:
 
 ```python
