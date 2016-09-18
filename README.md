@@ -16,7 +16,7 @@ print(matched) # True
 
 Currently it supports the following:
 
-* Repitition operators: \* \+ ? 
+* Repetition operators: \* \+ ? 
 * Parenthesis
 * Characters (no character sets)
 
